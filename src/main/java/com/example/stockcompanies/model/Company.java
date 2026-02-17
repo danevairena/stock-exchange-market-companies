@@ -38,6 +38,11 @@ public class Company {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Instant.now();
+    }
+
     // protected constructor without arguments
     protected Company() {}
 

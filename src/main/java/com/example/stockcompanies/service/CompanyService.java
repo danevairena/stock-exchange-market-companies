@@ -26,7 +26,7 @@ public class CompanyService {
         String name = requireNonBlank(company.getName(), "Name is required").trim();
         String country = requireNonBlank(company.getCountry(), "Country is required").trim().toUpperCase();
         String symbol = requireNonBlank(company.getSymbol(), "Symbol is required").trim().toUpperCase();
-        String email = requireNonBlank(company.getEmail(), "Email is required").trim().toUpperCase();
+        String email = requireNonBlank(company.getEmail(), "Email is required").trim();
         // checking for unique symbol
         if (companyRepository.existsBySymbol(symbol)) {
             throw new IllegalStateException("Company with symbol " + symbol + " already exists");
