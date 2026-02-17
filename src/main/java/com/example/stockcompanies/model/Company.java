@@ -1,10 +1,7 @@
 package com.example.stockcompanies.model;
 
-// mark class as entity
 import jakarta.persistence.*;
-// auto generate primary key
-// determine the method for ID generation
-//mark field as primary key
+
 import java.time.Instant;
 import java.util.Objects;
 
