@@ -47,12 +47,8 @@ class CompanyServiceTest {
     void createCompany_whenSymbolAlreadyExists_shouldThrow() {
         // mock company object
         Company company = mock(Company.class);
-        when(company.getName()).thenReturn("Apple");
-        when(company.getCountry()).thenReturn("us");
         when(company.getSymbol()).thenReturn("aapl");
-        when(company.getEmail()).thenReturn("test@apple.com");
-        when(company.getWebsite()).thenReturn(null);
-        // repository says that the symbol already exists
+
         when(companyRepository.existsBySymbol("AAPL")).thenReturn(true);
 
         // createCompany is called and an exception is expected
@@ -142,13 +138,9 @@ class CompanyServiceTest {
 
         when(companyRepository.findById(5L)).thenReturn(Optional.of(existing));
 
-        // updated company with new data
+        // mock company
         Company updated = mock(Company.class);
-        when(updated.getName()).thenReturn("New Name");
-        when(updated.getCountry()).thenReturn("bg");
         when(updated.getSymbol()).thenReturn("dup");
-        when(updated.getEmail()).thenReturn("a@b.com");
-        when(updated.getWebsite()).thenReturn(null);
 
         // check if requested symbol already exists
         when(companyRepository.existsBySymbol("DUP")).thenReturn(true);
