@@ -23,6 +23,8 @@ jobs:
       # actions/checkout clones the repo to the machine to access the code
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -37,3 +39,13 @@ jobs:
 
       - name: Build project
         run: ./gradlew build -x test
+
+      - name: Sonar Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+        with:
+          args: >
+            -Dsonar.projectKey=danevairena_stock-exchange-market-companies
+            -Dsonar.organization=danevairena
