@@ -3,6 +3,7 @@
 #jobs: = one or more jobs (build, test, deploy)
 #runs-on: = on what machine (Ubuntu, Windows, macOS)
 #steps: = sequential commands/actions
+# with: = give settings (parameters) to an action
 #uses: = ready action (like a library)
 #run: = command in terminal
 
