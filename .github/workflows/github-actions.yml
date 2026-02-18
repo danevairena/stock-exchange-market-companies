@@ -38,7 +38,7 @@ jobs:
         # chmod +x makes gradlew executable on Linux
         run: chmod +x gradlew
 
-      - name: Build and SonarCloud analysis
-        run: ./gradlew test jacocoTestReport sonar
+      - name: Build, SonarCloud analysis and coverage
+        run: ./gradlew clean test jacocoTestReport sonar
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
