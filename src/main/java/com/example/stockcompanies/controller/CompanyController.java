@@ -31,13 +31,11 @@ public class CompanyController {
         return companyService.createCompany(company);
     }
 
-    // GET /companies
     @GetMapping
     public List<Company> getAllCompanies() {
         return companyService.getAllCompanies();
     }
 
-    // PUT /companies/{id}
     @PutMapping("/{id}")
     // @PathVariable Long id takes id from URL. Body is the new data
     public Company updateCompany(@PathVariable Long id, @RequestBody Company updatedData) {

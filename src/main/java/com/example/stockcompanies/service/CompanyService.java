@@ -45,12 +45,10 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    // GET /companies
     public List<Company> getAllCompanies() {
         return companyRepository.findAll();
     }
 
-    // PUT /companies/{id}
     public Company updateCompany(Long id, Company updatedData) {
         // input validation to avoid NullPointerException (empty body)
         if (updatedData == null) {
