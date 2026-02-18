@@ -32,6 +32,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'com.h2database:h2'
 	implementation 'io.github.cdimascio:dotenv-java:3.0.0'
+	// WireMock for Spring Boot 3 (Jakarta-friendly)
+	testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:2.35.0"
 }
 
 tasks.named('test') {
