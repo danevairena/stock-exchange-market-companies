@@ -96,6 +96,25 @@ class CompanyServiceTest {
         verify(companyRepository).existsBySymbol("AAPL");
         verify(companyRepository).save(company);
     }
+    // if website is null service should not call updateWebsite(), but still should save the company
+    @Test
+    void createCompany_whenWebsiteIsNull_shouldSaveWithoutUpdatingWebsite() {
+        // mock company
+        Company company = mock(Company.class);
+        when(company.getName()).thenReturn("Apple");
+        when(company.getCountry()).thenReturn("us");
+        when(company.getSymbol()).thenReturn("aapl");
+        when(company.getEmail()).thenReturn("test@apple.com");
+        when(company.getWebsite()).thenReturn(null);
+
+        when(companyRepository.existsBySymbol("AAPL")).thenReturn(false);
+        when(companyRepository.save(company)).thenReturn(company);
+
+        companyService.createCompany(company);
+
+        verify(company, never()).updateWebsite(any());
+        verify(companyRepository).save(company);
+    }
 
     // the Service class do not work with the db itself, but delegates it to the repository class
     // getAllCompanies should return what repository returns
@@ -130,6 +149,18 @@ class CompanyServiceTest {
         verify(companyRepository).findById(1L);
         // save() should not be called
         verify(companyRepository, never()).save(any());
+    }
+
+    // if you pass null as updated company it should throw IllegalArgumentException and not to touch the repository at all
+    @Test
+    void updateCompany_whenBodyIsNull_shouldThrow() {
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> companyService.updateCompany(1L, null)
+        );
+
+        assertEquals("Company body is required", ex.getMessage());
+        verifyNoInteractions(companyRepository);
     }
 
     // when trying to change a symbol to an existing one it should throw an exception
