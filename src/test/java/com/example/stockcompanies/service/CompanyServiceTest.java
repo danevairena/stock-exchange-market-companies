@@ -51,7 +51,6 @@ class CompanyServiceTest {
         when(company.getCountry()).thenReturn("us");
         when(company.getSymbol()).thenReturn("aapl");
         when(company.getEmail()).thenReturn("test@apple.com");
-        when(company.getWebsite()).thenReturn(null);
 
         when(companyRepository.existsBySymbol("AAPL")).thenReturn(true);
 
@@ -148,7 +147,6 @@ class CompanyServiceTest {
         when(updated.getCountry()).thenReturn("bg");
         when(updated.getSymbol()).thenReturn("dup");
         when(updated.getEmail()).thenReturn("a@b.com");
-        when(updated.getWebsite()).thenReturn(null);
 
         // check if requested symbol already exists
         when(companyRepository.existsBySymbol("DUP")).thenReturn(true);
