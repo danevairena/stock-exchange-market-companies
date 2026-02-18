@@ -2,7 +2,10 @@ package com.example.stockcompanies.controller;
 
 import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.service.CompanyStocksService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 // @RestController returns JSON
 @RestController
