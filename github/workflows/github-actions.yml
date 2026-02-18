@@ -1,0 +1,39 @@
+# name: = what it will be called in GitHub
+#on: = when it is started (push, pull_request, schedule)
+#jobs: = one or more jobs (build, test, deploy)
+#runs-on: = on what machine (Ubuntu, Windows, macOS)
+#steps: = sequential commands/actions
+#uses: = ready action (like a library)
+#run: = command in terminal
+
+name: GitHub Actions Build
+
+# run on every push to any branch
+on:
+  push:
+    branches: ["**"]
+
+# tasks to be performed
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # the steps inside the job runs one after the other
+    steps:
+      # actions/checkout clones the repo to the machine to access the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Grant permission
+        # chmod +x makes gradlew executable on Linux
+        run: chmod +x gradlew
+
+      - name: Build project
+        run: ./gradlew build
