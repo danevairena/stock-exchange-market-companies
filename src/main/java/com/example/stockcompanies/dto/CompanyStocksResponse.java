@@ -5,6 +5,7 @@ import java.time.Instant;
 // CompanyStocksResponse is the DTO class that the endpoint returns to the client
 // it combines data from database (Company) and Finnhub or cache (CompanyStock)
 public class CompanyStocksResponse {
+
     // Company entity fields
     private Long id;
     private String name;
@@ -13,11 +14,11 @@ public class CompanyStocksResponse {
     private String website;
     private String email;
     private Instant createdAt;
+
     // CompanyStock/Finnhub fields
     private Double marketCapitalization;
     private Double shareOutstanding;
 
-    // getters and setters
     // setters because service fills in the response
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

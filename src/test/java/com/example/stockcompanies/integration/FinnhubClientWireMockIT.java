@@ -36,10 +36,8 @@ class FinnhubClientWireMockIT {
         }
     }
 
-    // integration test
     @Test
     void getCompanyProfile2_shouldReturnParsedResponse() throws Exception {
-        // arrange
         String symbol = "AAPL";
         String apiKey = "test-api-key";
 
@@ -61,7 +59,6 @@ class FinnhubClientWireMockIT {
                                 }
                                 """)));
 
-        // create the real client
         FinnhubClient client = new FinnhubClient();
 
         // setField - Spring usually sets it but there is no SpringBootTest, so we set it manually
@@ -82,7 +79,6 @@ class FinnhubClientWireMockIT {
                 .withQueryParam("token", equalTo(apiKey)));
     }
 
-    // helper method
     private static void setField(Object target, String fieldName, Object value) throws Exception {
         Field f = target.getClass().getDeclaredField(fieldName);
         f.setAccessible(true);

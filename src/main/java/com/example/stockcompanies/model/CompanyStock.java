@@ -21,14 +21,10 @@ import java.util.Objects;
 @Table(name = "company_stocks", uniqueConstraints = @UniqueConstraint(name = "uk_company_stock_company_date", columnNames = {"company_id", "fetch_date"}))
 
 public class CompanyStock {
-    // primary key
     @Id
-    // db generates an auto-increment id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // many-to-one relation
-    // many snapshots per company
     // FetchType.LAZY -> when loading CompanyStock, Hibernate does NOT automatically load Company until you need it
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     // the foreign key column in company_stocks is called company_id
@@ -48,10 +44,8 @@ public class CompanyStock {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    // protected constructor without arguments
     protected CompanyStock() {}
 
-    // constructor with parameters
     public CompanyStock(Company company, LocalDate fetchDate, Double marketCapitalization, Double shareOutstanding) {
         // snapshot validation - if any field is null throw NullPointerException immediately and don’t allow invalid records to reach the database
         this.company = Objects.requireNonNull(company);

@@ -24,10 +24,8 @@ import static org.mockito.Mockito.when;
 // use the Mockito library to create mock objects and integrate it with other tools
 @ExtendWith(MockitoExtension.class)
 class CompanyServiceTest {
-    // creates mock of the repository
     @Mock
     CompanyRepository companyRepository;
-    // creates a real CompanyService, but injects the mocked companyRepository into it
     @InjectMocks
     CompanyService companyService;
 
@@ -52,7 +50,6 @@ class CompanyServiceTest {
     // save() should never be called because there is a conflict
     @Test
     void createCompany_whenSymbolAlreadyExists_shouldThrow() {
-        // mock company object
         Company company = mock(Company.class);
         when(company.getName()).thenReturn("Apple");
         when(company.getCountry()).thenReturn("us");
@@ -61,7 +58,6 @@ class CompanyServiceTest {
 
         when(companyRepository.existsBySymbol("AAPL")).thenReturn(true);
 
-        // createCompany is called and an exception is expected
         IllegalStateException ex = assertThrows(
                 IllegalStateException.class,
                 () -> companyService.createCompany(company)
@@ -106,7 +102,6 @@ class CompanyServiceTest {
     // if website is null service should not call updateWebsite(), but still should save the company
     @Test
     void createCompany_whenWebsiteIsNull_shouldSaveWithoutUpdatingWebsite() {
-        // mock company
         Company company = mock(Company.class);
         when(company.getName()).thenReturn("Apple");
         when(company.getCountry()).thenReturn("us");
@@ -141,10 +136,8 @@ class CompanyServiceTest {
     // when company is not found it should throw an exception
     @Test
     void updateCompany_whenNotFound_shouldThrow() {
-        // Repository returns empty
         when(companyRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // create mock company
         Company updated = mock(Company.class);
         // if there is no company with this id - IllegalStateException
         IllegalStateException ex = assertThrows(
@@ -179,7 +172,6 @@ class CompanyServiceTest {
 
         when(companyRepository.findById(5L)).thenReturn(Optional.of(existing));
 
-        // mock company
         Company updated = mock(Company.class);
         when(updated.getName()).thenReturn("New Name");
         when(updated.getCountry()).thenReturn("bg");
@@ -210,7 +202,7 @@ class CompanyServiceTest {
         when(existing.getSymbol()).thenReturn("OLD");
         // existing says that the company that is “already in the database”
         when(companyRepository.findById(10L)).thenReturn(Optional.of(existing));
-        // mock company
+
         Company updated = mock(Company.class);
         when(updated.getName()).thenReturn("  Tesla  ");
         when(updated.getCountry()).thenReturn("  us ");

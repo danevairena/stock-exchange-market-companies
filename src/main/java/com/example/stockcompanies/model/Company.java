@@ -22,11 +22,9 @@ public class Company {
     @Id
     // generating IDs in advance to optimize insert performance
     @SequenceGenerator(name = "company_seq", sequenceName = "company_seq", allocationSize = 20)
-    //the value of the primary key will be generated from the db (autoincrement)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "company_seq")
     private Long id;
 
-    // nullable = false -> not null
     @Column(nullable = false)
     private String name;
 
@@ -63,7 +61,6 @@ public class Company {
         this.createdAt = createdAt;
     }
 
-    // getters
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getCountry() { return country; }

@@ -53,13 +53,10 @@ class CompanyStocksServiceTest {
 
         verify(companyRepository).findById(companyId);
 
-        // do not call finnfub
         verifyNoInteractions(finnhubClient);
 
-        // do not save
         verify(companyStockRepository, never()).save(any());
 
-        // do not check cache when there is no company
         verify(companyStockRepository, never()).findByCompanyIdAndFetchDate(anyLong(), any());
     }
 
@@ -88,7 +85,6 @@ class CompanyStocksServiceTest {
 
         CompanyStocksResponse result = service.getCompanyStocks(companyId);
 
-        // returns cached data
         assertNotNull(result);
         assertEquals(companyId, result.getId());
         assertEquals("Acme Inc", result.getName());
@@ -99,10 +95,8 @@ class CompanyStocksServiceTest {
         assertEquals(123.45, result.getMarketCapitalization());
         assertEquals(67.89, result.getShareOutstanding());
 
-        // do not finnhub
         verifyNoInteractions(finnhubClient);
 
-        // do not save-ва
         verify(companyStockRepository, never()).save(any());
 
         verify(companyRepository).findById(companyId);
@@ -144,7 +138,6 @@ class CompanyStocksServiceTest {
 
         CompanyStocksResponse result = service.getCompanyStocks(companyId);
 
-        // return response
         assertNotNull(result);
         assertEquals(companyId, result.getId());
         assertEquals("MegaCorp", result.getName());
@@ -152,10 +145,8 @@ class CompanyStocksServiceTest {
         assertEquals(555.0, result.getMarketCapitalization());
         assertEquals(111.0, result.getShareOutstanding());
 
-        // call finnhubClient
         verify(finnhubClient).getCompanyProfile2("MEGA");
 
-        // save CompanyStock and check fields
         verify(companyStockRepository).save(captor.capture());
         CompanyStock saved = captor.getValue();
 

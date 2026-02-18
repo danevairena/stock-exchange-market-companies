@@ -9,12 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 // @RestController returns JSON
 @RestController
-// / all endpoints in this controller start with /company-stocks
+// all endpoints in this controller start with /company-stocks
 @RequestMapping("/company-stocks")
 public class CompanyStocksController {
-    // CompanyStocksController depends on CompanyStocksService
+
     // Constructor injection ensures that the dependency will always be available, allowing the field to be immutable
     private final CompanyStocksService companyStocksService;
+
     public CompanyStocksController(CompanyStocksService companyStocksService) {
         this.companyStocksService = companyStocksService;
     }

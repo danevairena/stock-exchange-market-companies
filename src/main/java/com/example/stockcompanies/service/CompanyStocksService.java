@@ -13,7 +13,6 @@ import java.time.LocalDate;
 
 @Service
 public class CompanyStocksService {
-    // Service depends on database, cache table and Finnhub API
     private final CompanyRepository companyRepository;
     private final CompanyStockRepository companyStockRepository;
     private final FinnhubClient finnhubClient;
@@ -31,13 +30,10 @@ public class CompanyStocksService {
 
     public CompanyStocksResponse getCompanyStocks(Long companyId) {
 
-        // find company in database
-        // if there is no Company Spring throws an exception.
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() ->
                         new IllegalStateException(
                                 "Company with id " + companyId + " not found"));
-        // get today's date
         LocalDate today = LocalDate.now();
 
         // check cache - is there already stock data for this company for today
@@ -57,30 +53,24 @@ public class CompanyStocksService {
             Company company,
             LocalDate date) {
 
-        // call Finnhub
         FinnhubCompanyProfileResponse finnhub =
                 finnhubClient
                         .getCompanyProfile2(
                                 company.getSymbol());
-        // creates a CompanyStock entity
         CompanyStock companyStock =
                 new CompanyStock(
                         company,
                         date,
                         finnhub.getMarketCapitalization(),
                         finnhub.getShareOutstanding());
-        // save the snapshot in db
         return companyStockRepository.save(companyStock);
     }
 
-    // CompanyStocksResponse method creates a response object
     private CompanyStocksResponse mapToResponse(
             Company company,
             CompanyStock stock) {
-        // create DTO
         CompanyStocksResponse response =
                 new CompanyStocksResponse();
-        // company fields
         response.setId(company.getId());
         response.setName(company.getName());
         response.setSymbol(company.getSymbol());
@@ -88,7 +78,6 @@ public class CompanyStocksService {
         response.setWebsite(company.getWebsite());
         response.setEmail(company.getEmail());
         response.setCreatedAt(company.getCreatedAt());
-        // stock fields
         response.setMarketCapitalization(
                 stock.getMarketCapitalization());
 
