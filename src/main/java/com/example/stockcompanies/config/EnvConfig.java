@@ -3,8 +3,10 @@ package com.example.stockcompanies.config;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 // configuration class
+@Profile("local")
 @Configuration
 public class EnvConfig {
     // @PostConstruct -> execute the method immediately after Spring creates the class
