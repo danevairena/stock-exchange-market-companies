@@ -38,15 +38,7 @@ jobs:
         # chmod +x makes gradlew executable on Linux
         run: chmod +x gradlew
 
-      - name: Build project
-        run: ./gradlew build -x test
-
-      - name: Sonar Scan
-        uses: SonarSource/sonarqube-scan-action@v6
+      - name: Build and SonarCloud analysis
+        run: ./gradlew build sonar -x test
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.projectKey=danevairena_stock-exchange-market-companies
-            -Dsonar.organization=danevairena
