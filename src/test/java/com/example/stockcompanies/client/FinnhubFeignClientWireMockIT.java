@@ -1,12 +1,20 @@
-package com.example.stockcompanies.integration;
+package com.example.stockcompanies.client;
 
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Field;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -16,11 +24,25 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 // check that an HTTP call is made, URL is correct, JSON is parsed correctly
 // without actually calling Finnhub
-class FinnhubClientWireMockIT {
+@SpringBootTest(classes = FinnhubFeignClientWireMockIT.TestApp.class)
+class FinnhubFeignClientWireMockIT {
 
     // starts fake HTTP server
     // dynamicPort() WireMock chooses a free port
     static WireMockServer wm;
+
+    @Autowired
+    FinnhubFeignClient client;
+
+    @SpringBootConfiguration
+    @EnableAutoConfiguration(exclude = {
+            DataSourceAutoConfiguration.class,
+            HibernateJpaAutoConfiguration.class,
+            SqlInitializationAutoConfiguration.class
+    })
+    @EnableFeignClients(clients = FinnhubFeignClient.class)
+    static class TestApp {
+    }
 
     @BeforeAll
     static void startServer() {
@@ -34,6 +56,12 @@ class FinnhubClientWireMockIT {
         if (wm != null) {
             wm.stop();
         }
+    }
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("finnhub.base-url", () -> "http://localhost:" + wm.port());
+        registry.add("finnhub.api-key", () -> "test-api-key");
     }
 
     @Test
@@ -59,14 +87,8 @@ class FinnhubClientWireMockIT {
                                 }
                                 """)));
 
-        FinnhubClient client = new FinnhubClient();
-
-        // setField - Spring usually sets it but there is no SpringBootTest, so we set it manually
-        setField(client, "baseUrl", "http://localhost:" + wm.port());
-        setField(client, "apiKey", apiKey);
-
         // call the method HTTP GET -> WireMock -> WireMock returns JSON -> Jackson -> parse -> DTO
-        FinnhubCompanyProfileResponse resp = client.getCompanyProfile2(symbol);
+        FinnhubCompanyProfileResponse resp = client.getCompanyProfile2(symbol, apiKey);
 
         // assert: check parsing
         assertNotNull(resp);
@@ -77,11 +99,5 @@ class FinnhubClientWireMockIT {
         verify(1, getRequestedFor(urlPathEqualTo("/stock/profile2"))
                 .withQueryParam("symbol", equalTo(symbol))
                 .withQueryParam("token", equalTo(apiKey)));
-    }
-
-    private static void setField(Object target, String fieldName, Object value) throws Exception {
-        Field f = target.getClass().getDeclaredField(fieldName);
-        f.setAccessible(true);
-        f.set(target, value);
     }
 }

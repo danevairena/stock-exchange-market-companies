@@ -2,11 +2,12 @@ package com.example.stockcompanies.service;
 
 import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
-import com.example.stockcompanies.integration.FinnhubClient;
+import com.example.stockcompanies.client.FinnhubFeignClient;
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.model.CompanyStock;
 import com.example.stockcompanies.repository.CompanyRepository;
 import com.example.stockcompanies.repository.CompanyStockRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,13 +16,16 @@ import java.time.LocalDate;
 public class CompanyStocksService {
     private final CompanyRepository companyRepository;
     private final CompanyStockRepository companyStockRepository;
-    private final FinnhubClient finnhubClient;
+    private final FinnhubFeignClient finnhubClient;
+
+    @Value("${finnhub.api-key}")
+    private String apiKey;
 
     // Constructor Injection - Spring automatically provides the dependencies
     public CompanyStocksService(
             CompanyRepository companyRepository,
             CompanyStockRepository companyStockRepository,
-            FinnhubClient finnhubClient) {
+            FinnhubFeignClient finnhubClient) {
 
         this.companyRepository = companyRepository;
         this.companyStockRepository = companyStockRepository;
@@ -54,9 +58,7 @@ public class CompanyStocksService {
             LocalDate date) {
 
         FinnhubCompanyProfileResponse finnhub =
-                finnhubClient
-                        .getCompanyProfile2(
-                                company.getSymbol());
+                finnhubClient.getCompanyProfile2(company.getSymbol(), apiKey);
         CompanyStock companyStock =
                 new CompanyStock(
                         company,

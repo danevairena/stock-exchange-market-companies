@@ -1,8 +1,8 @@
 package com.example.stockcompanies.service;
 
+import com.example.stockcompanies.client.FinnhubFeignClient;
 import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
-import com.example.stockcompanies.integration.FinnhubClient;
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.model.CompanyStock;
 import com.example.stockcompanies.repository.CompanyRepository;
@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -32,11 +33,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CompanyStocksServiceTest {
 
-    @Mock CompanyRepository companyRepository;
-    @Mock CompanyStockRepository companyStockRepository;
-    @Mock FinnhubClient finnhubClient;
+    @Mock
+    CompanyRepository companyRepository;
+    @Mock
+    CompanyStockRepository companyStockRepository;
+    @Mock
+    FinnhubFeignClient finnhubClient;
 
-    @InjectMocks CompanyStocksService service;
+    @InjectMocks
+    CompanyStocksService service;
 
     // company not found
     @Test
@@ -92,8 +97,8 @@ class CompanyStocksServiceTest {
         assertEquals("US", result.getCountry());
         assertEquals("https://acme.example", result.getWebsite());
         assertEquals("info@acme.example", result.getEmail());
-        assertEquals(123.45, result.getMarketCapitalization());
-        assertEquals(67.89, result.getShareOutstanding());
+        assertEquals(Double.valueOf(123.45), result.getMarketCapitalization());
+        assertEquals(Double.valueOf(67.89), result.getShareOutstanding());
 
         verifyNoInteractions(finnhubClient);
 
@@ -106,6 +111,8 @@ class CompanyStocksServiceTest {
     // cache is missing
     @Test
     void getCompanyStocks_whenCacheMissing_shouldFetchAndSave() {
+        ReflectionTestUtils.setField(service, "apiKey", "test-api-key");
+
         long companyId = 99L;
         LocalDate today = LocalDate.now();
 
@@ -126,7 +133,7 @@ class CompanyStocksServiceTest {
         when(finnhubResp.getMarketCapitalization()).thenReturn(555.0);
         when(finnhubResp.getShareOutstanding()).thenReturn(111.0);
 
-        when(finnhubClient.getCompanyProfile2("MEGA")).thenReturn(finnhubResp);
+        when(finnhubClient.getCompanyProfile2("MEGA", "test-api-key")).thenReturn(finnhubResp);
 
         // want to test companyStockRepository.save(companyStock), but companyStock is created inside the service
         // don't have a direct reference to this object in the test, so ArgumentCaptor allows us to "steal" it
@@ -142,10 +149,10 @@ class CompanyStocksServiceTest {
         assertEquals(companyId, result.getId());
         assertEquals("MegaCorp", result.getName());
         assertEquals("MEGA", result.getSymbol());
-        assertEquals(555.0, result.getMarketCapitalization());
-        assertEquals(111.0, result.getShareOutstanding());
+        assertEquals(Double.valueOf(555.0), result.getMarketCapitalization());
+        assertEquals(Double.valueOf(111.0), result.getShareOutstanding());
 
-        verify(finnhubClient).getCompanyProfile2("MEGA");
+        verify(finnhubClient).getCompanyProfile2("MEGA", "test-api-key");
 
         verify(companyStockRepository).save(captor.capture());
         CompanyStock saved = captor.getValue();
@@ -153,8 +160,8 @@ class CompanyStocksServiceTest {
         assertNotNull(saved);
         assertSame(company, saved.getCompany());
         assertEquals(today, saved.getFetchDate());
-        assertEquals(555.0, saved.getMarketCapitalization());
-        assertEquals(111.0, saved.getShareOutstanding());
+        assertEquals(Double.valueOf(555.0), saved.getMarketCapitalization());
+        assertEquals(Double.valueOf(111.0), saved.getShareOutstanding());
 
         verify(companyRepository).findById(companyId);
         verify(companyStockRepository).findByCompanyIdAndFetchDate(companyId, today);
