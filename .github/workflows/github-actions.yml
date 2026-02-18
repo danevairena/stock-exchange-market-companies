@@ -39,6 +39,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and SonarCloud analysis
-        run: ./gradlew test jacocoTestReport sonar
+        run: ./gradlew test jacocoTestReport sonar --stacktrace --info
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
