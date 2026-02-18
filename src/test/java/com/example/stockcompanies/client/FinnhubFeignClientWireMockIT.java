@@ -18,13 +18,15 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 // check that an HTTP call is made, URL is correct, JSON is parsed correctly
 // without actually calling Finnhub
-@SpringBootTest(classes = FinnhubFeignClientWireMockIT.TestApp.class)
+@SpringBootTest(
+        classes = FinnhubFeignClientWireMockIT.TestApp.class,
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
+)
 class FinnhubFeignClientWireMockIT {
 
     // starts fake HTTP server
@@ -65,7 +67,7 @@ class FinnhubFeignClientWireMockIT {
     }
 
     @Test
-    void getCompanyProfile2_shouldReturnParsedResponse() throws Exception {
+    void getCompanyProfile2_shouldReturnParsedResponse() {
         String symbol = "AAPL";
         String apiKey = "test-api-key";
 

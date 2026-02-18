@@ -42,6 +42,7 @@ dependencies {
 	testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:2.35.0"
 	// Feign Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	testImplementation "io.github.openfeign:feign-jackson:13.5"
 }
 
 tasks.named('test') {
