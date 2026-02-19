@@ -1,6 +1,5 @@
 package com.example.stockcompanies.client;
 
-import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -18,6 +17,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.junit.jupiter.api.Assertions.*;
 
+// use profile without db configuration
 @ActiveProfiles("no-db")
 @SpringBootTest(
         classes = FinnhubFeignClientWireMockIT.TestApp.class,
@@ -25,15 +25,19 @@ import static org.junit.jupiter.api.Assertions.*;
 )
 class FinnhubFeignClientWireMockIT {
 
+    // WireMock server simulates external Finnhub API
     static final WireMockServer wm =
             new WireMockServer(wireMockConfig().dynamicPort());
 
+    // real Feign client injected by Spring
     @Autowired
     FinnhubFeignClient client;
 
+    // SpringBoot test configuration enabling only Feign client
     @SpringBootConfiguration
     @EnableFeignClients(clients = FinnhubFeignClient.class)
     @EnableAutoConfiguration(excludeName = {
+            // exclude db autoconfiguration
             "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration",
             "org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration",
             "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration",
@@ -45,12 +49,14 @@ class FinnhubFeignClientWireMockIT {
     @BeforeAll
     static void startServer() {
 
+        // start mock HTTP server
         wm.start();
 
-        // 🔥 CRITICAL FIX
+        // configure WireMock client
         configureFor("localhost", wm.port());
     }
 
+    // override application properties to point Feign client to WireMock instead of real API
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
 
@@ -67,6 +73,7 @@ class FinnhubFeignClientWireMockIT {
     @AfterAll
     static void stopServer() {
 
+        // stop mock server after tests
         wm.stop();
     }
 
@@ -76,6 +83,7 @@ class FinnhubFeignClientWireMockIT {
         String symbol = "AAPL";
         String apiKey = "test-api-key";
 
+        // mock Finnhub API response
         stubFor(get(urlPathEqualTo("/stock/profile2"))
                 .withQueryParam("symbol", equalTo(symbol))
                 .withQueryParam("token", equalTo(apiKey))
@@ -86,8 +94,10 @@ class FinnhubFeignClientWireMockIT {
                         }
                         """)));
 
+        // call Feign client
         var resp = client.getCompanyProfile2(symbol, apiKey);
 
+        // validate response mapping
         assertNotNull(resp);
 
         assertEquals(1234.56,
@@ -96,6 +106,7 @@ class FinnhubFeignClientWireMockIT {
         assertEquals(987.65,
                 resp.getShareOutstanding());
 
+        // verify HTTP call was actually made
         verify(getRequestedFor(urlPathEqualTo("/stock/profile2")));
     }
 }
