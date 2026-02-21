@@ -85,6 +85,11 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+
+	// fixes mockito dynamic agent loading warning on JDK 25
+	// safe configuration and recommended by mockito documentation
+	jvmArgs "-XX:+EnableDynamicAgentLoading"
+
 	finalizedBy jacocoTestReport
 }
 
@@ -94,6 +99,10 @@ tasks.register('integrationTest', Test) {
 	testClassesDirs = sourceSets.integrationTest.output.classesDirs
 	classpath = sourceSets.integrationTest.runtimeClasspath
 	useJUnitPlatform()
+
+	// fixes mockito dynamic agent loading warning on JDK 25
+	// required for testcontainers and mockito on newer JDK versions
+	jvmArgs "-XX:+EnableDynamicAgentLoading"
 
 	testLogging {
 		events "failed", "skipped"
