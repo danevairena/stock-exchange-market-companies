@@ -55,7 +55,6 @@ class CompanyStocksServiceTest {
     @Test
     void getCompanyStocks_whenCacheExists_shouldReturnCache() {
         long companyId = 7L;
-        LocalDate today = LocalDate.now();
 
         Company company = mock(Company.class);
         CompanyStock cached = mock(CompanyStock.class);
