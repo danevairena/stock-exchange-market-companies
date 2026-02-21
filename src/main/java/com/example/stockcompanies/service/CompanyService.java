@@ -73,6 +73,11 @@ public class CompanyService {
         return companyRepository.save(existing);
     }
 
+    public Company getCompanyById(Long id) {
+        return companyRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Company with id " + id + " not found"));
+    }
+
     private String requireNonBlank(String value, String message) {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException(message);

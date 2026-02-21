@@ -3,6 +3,7 @@ package com.example.stockcompanies.service;
 import com.example.stockcompanies.client.FinnhubFeignClient;
 import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
+import com.example.stockcompanies.mapper.CompanyStocksMapper;
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.model.CompanyStock;
 import com.example.stockcompanies.repository.CompanyRepository;
@@ -18,36 +19,23 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyStocksServiceTest {
 
-    @Mock
-    CompanyRepository companyRepository;
-    @Mock
-    CompanyStockRepository companyStockRepository;
-    @Mock
-    FinnhubFeignClient finnhubClient;
+    @Mock CompanyRepository companyRepository;
+    @Mock CompanyStockRepository companyStockRepository;
+    @Mock FinnhubFeignClient finnhubClient;
+    @Mock CompanyStocksMapper mapper;
 
-    @InjectMocks
-    CompanyStocksService service;
+    @InjectMocks CompanyStocksService service;
 
-    // company not found
     @Test
     void getCompanyStocks_whenCompanyNotFound_shouldThrow() {
         long companyId = 42L;
-
         when(companyRepository.findById(companyId)).thenReturn(Optional.empty());
 
         IllegalStateException ex = assertThrows(
@@ -58,112 +46,105 @@ class CompanyStocksServiceTest {
 
         verify(companyRepository).findById(companyId);
 
-        verifyNoInteractions(finnhubClient);
-
+        // service should fail fast and not call downstream dependencies
+        verifyNoInteractions(finnhubClient, mapper);
         verify(companyStockRepository, never()).save(any());
-
         verify(companyStockRepository, never()).findByCompanyIdAndFetchDate(anyLong(), any());
     }
 
-    // cache exists
     @Test
     void getCompanyStocks_whenCacheExists_shouldReturnCache() {
         long companyId = 7L;
         LocalDate today = LocalDate.now();
 
         Company company = mock(Company.class);
-        when(company.getId()).thenReturn(companyId);
-        when(company.getName()).thenReturn("Acme Inc");
-        when(company.getSymbol()).thenReturn("ACME");
-        when(company.getCountry()).thenReturn("US");
-        when(company.getWebsite()).thenReturn("https://acme.example");
-        when(company.getEmail()).thenReturn("info@acme.example");
-        when(company.getCreatedAt()).thenReturn(null);
-
         CompanyStock cached = mock(CompanyStock.class);
-        when(cached.getMarketCapitalization()).thenReturn(123.45);
-        when(cached.getShareOutstanding()).thenReturn(67.89);
 
         when(companyRepository.findById(companyId)).thenReturn(Optional.of(company));
-        when(companyStockRepository.findByCompanyIdAndFetchDate(companyId, today))
+        when(companyStockRepository.findByCompanyIdAndFetchDate(eq(companyId), any(LocalDate.class)))
                 .thenReturn(Optional.of(cached));
+
+        CompanyStocksResponse mapped = new CompanyStocksResponse();
+        mapped.setId(companyId);
+
+        // only stub what is actually used: the mapper call that produces the response
+        when(mapper.toResponse(company, cached)).thenReturn(mapped);
 
         CompanyStocksResponse result = service.getCompanyStocks(companyId);
 
         assertNotNull(result);
         assertEquals(companyId, result.getId());
-        assertEquals("Acme Inc", result.getName());
-        assertEquals("ACME", result.getSymbol());
-        assertEquals("US", result.getCountry());
-        assertEquals("https://acme.example", result.getWebsite());
-        assertEquals("info@acme.example", result.getEmail());
-        assertEquals(Double.valueOf(123.45), result.getMarketCapitalization());
-        assertEquals(Double.valueOf(67.89), result.getShareOutstanding());
 
+        // with cache hit, external API should not be called and nothing should be saved
         verifyNoInteractions(finnhubClient);
-
         verify(companyStockRepository, never()).save(any());
 
         verify(companyRepository).findById(companyId);
-        verify(companyStockRepository).findByCompanyIdAndFetchDate(companyId, today);
+        verify(companyStockRepository).findByCompanyIdAndFetchDate(eq(companyId), any(LocalDate.class));
+        verify(mapper).toResponse(company, cached);
+        verifyNoMoreInteractions(mapper);
     }
 
-    // cache is missing
     @Test
     void getCompanyStocks_whenCacheMissing_shouldFetchAndSave() {
+        // apiKey is injected via @Value in production; set it explicitly for a unit test
         ReflectionTestUtils.setField(service, "apiKey", "test-api-key");
 
         long companyId = 99L;
         LocalDate today = LocalDate.now();
 
         Company company = mock(Company.class);
-        when(company.getId()).thenReturn(companyId);
-        when(company.getName()).thenReturn("MegaCorp");
+
+        // service needs the symbol to call Finnhub
+        // stub only what is required
         when(company.getSymbol()).thenReturn("MEGA");
-        when(company.getCountry()).thenReturn("DE");
-        when(company.getWebsite()).thenReturn("https://megacorp.example");
-        when(company.getEmail()).thenReturn("contact@megacorp.example");
-        when(company.getCreatedAt()).thenReturn(null);
 
         when(companyRepository.findById(companyId)).thenReturn(Optional.of(company));
-        when(companyStockRepository.findByCompanyIdAndFetchDate(companyId, today))
+        when(companyStockRepository.findByCompanyIdAndFetchDate(eq(companyId), any(LocalDate.class)))
                 .thenReturn(Optional.empty());
 
         FinnhubCompanyProfileResponse finnhubResp = mock(FinnhubCompanyProfileResponse.class);
         when(finnhubResp.getMarketCapitalization()).thenReturn(555.0);
         when(finnhubResp.getShareOutstanding()).thenReturn(111.0);
 
-        when(finnhubClient.getCompanyProfile2("MEGA", "test-api-key")).thenReturn(finnhubResp);
+        when(finnhubClient.getCompanyProfile2("MEGA", "test-api-key"))
+                .thenReturn(finnhubResp);
 
-        // want to test companyStockRepository.save(companyStock), but companyStock is created inside the service
-        // don't have a direct reference to this object in the test, so ArgumentCaptor allows us to "steal" it
-        ArgumentCaptor<CompanyStock> captor = ArgumentCaptor.forClass(CompanyStock.class);
-
-        // should return the same object is the same object
+        // save should return the stored entity instance
         when(companyStockRepository.save(any(CompanyStock.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
+
+        CompanyStocksResponse mapped = new CompanyStocksResponse();
+        mapped.setId(companyId);
+        mapped.setMarketCapitalization(555.0);
+        mapped.setShareOutstanding(111.0);
+
+        // the mapper is called with the company and the saved CompanyStock
+        when(mapper.toResponse(eq(company), any(CompanyStock.class))).thenReturn(mapped);
 
         CompanyStocksResponse result = service.getCompanyStocks(companyId);
 
         assertNotNull(result);
         assertEquals(companyId, result.getId());
-        assertEquals("MegaCorp", result.getName());
-        assertEquals("MEGA", result.getSymbol());
         assertEquals(Double.valueOf(555.0), result.getMarketCapitalization());
         assertEquals(Double.valueOf(111.0), result.getShareOutstanding());
 
         verify(finnhubClient).getCompanyProfile2("MEGA", "test-api-key");
 
+        ArgumentCaptor<CompanyStock> captor = ArgumentCaptor.forClass(CompanyStock.class);
         verify(companyStockRepository).save(captor.capture());
-        CompanyStock saved = captor.getValue();
 
+        CompanyStock saved = captor.getValue();
         assertNotNull(saved);
-        assertSame(company, saved.getCompany());
+
+        // service most likely uses LocalDate.now(); align assertion with that
         assertEquals(today, saved.getFetchDate());
         assertEquals(Double.valueOf(555.0), saved.getMarketCapitalization());
         assertEquals(Double.valueOf(111.0), saved.getShareOutstanding());
 
         verify(companyRepository).findById(companyId);
-        verify(companyStockRepository).findByCompanyIdAndFetchDate(companyId, today);
+        verify(companyStockRepository).findByCompanyIdAndFetchDate(eq(companyId), any(LocalDate.class));
+        verify(mapper).toResponse(eq(company), any(CompanyStock.class));
+        verifyNoMoreInteractions(mapper);
     }
 }

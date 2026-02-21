@@ -3,6 +3,7 @@ package com.example.stockcompanies.service;
 import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
 import com.example.stockcompanies.client.FinnhubFeignClient;
+import com.example.stockcompanies.mapper.CompanyStocksMapper;
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.model.CompanyStock;
 import com.example.stockcompanies.repository.CompanyRepository;
@@ -17,6 +18,7 @@ public class CompanyStocksService {
     private final CompanyRepository companyRepository;
     private final CompanyStockRepository companyStockRepository;
     private final FinnhubFeignClient finnhubClient;
+    private final CompanyStocksMapper mapper;
 
     @Value("${finnhub.api-key}")
     private String apiKey;
@@ -25,11 +27,13 @@ public class CompanyStocksService {
     public CompanyStocksService(
             CompanyRepository companyRepository,
             CompanyStockRepository companyStockRepository,
-            FinnhubFeignClient finnhubClient) {
+            FinnhubFeignClient finnhubClient,
+            CompanyStocksMapper mapper) {
 
         this.companyRepository = companyRepository;
         this.companyStockRepository = companyStockRepository;
         this.finnhubClient = finnhubClient;
+        this.mapper = mapper;
     }
 
     public CompanyStocksResponse getCompanyStocks(Long companyId) {
@@ -71,21 +75,7 @@ public class CompanyStocksService {
     private CompanyStocksResponse mapToResponse(
             Company company,
             CompanyStock stock) {
-        CompanyStocksResponse response =
-                new CompanyStocksResponse();
-        response.setId(company.getId());
-        response.setName(company.getName());
-        response.setSymbol(company.getSymbol());
-        response.setCountry(company.getCountry());
-        response.setWebsite(company.getWebsite());
-        response.setEmail(company.getEmail());
-        response.setCreatedAt(company.getCreatedAt());
-        response.setMarketCapitalization(
-                stock.getMarketCapitalization());
-
-        response.setShareOutstanding(
-                stock.getShareOutstanding());
-
-        return response;
+        // return response
+        return mapper.toResponse(company, stock);
     }
 }
