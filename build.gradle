@@ -28,10 +28,32 @@ dependencyManagement {
 	}
 }
 
+/* ---------------- Integration test source set + configurations ---------------- */
+sourceSets {
+	integrationTest {
+		java.srcDirs = ['src/integrationTest/java']
+		resources.srcDirs = ['src/integrationTest/resources']
+
+		compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+		runtimeClasspath += output + compileClasspath
+	}
+}
+
+// IMPORTANT: define configs before using them in `dependencies { }`
+configurations {
+	integrationTestImplementation
+	integrationTestRuntimeOnly
+
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+/* --------------------------------------------------------------------------- */
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
+	// Postgres for the real app runtime
 	runtimeOnly 'org.postgresql:postgresql'
 
 	// Swagger / OpenAPI
@@ -43,17 +65,44 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	testImplementation "io.github.openfeign:feign-jackson:13.5"
 
+	// Unit tests (H2)
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'com.h2database:h2'
 
-	// WireMock 3.x (standalone)
+	// WireMock (OK for unit + integration tests)
 	testImplementation "org.wiremock:wiremock-standalone:3.13.2"
+
+	// MapStruct
+	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	// Integration tests (Testcontainers + Postgres driver)
+	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+	integrationTestImplementation 'org.testcontainers:junit-jupiter:1.20.3'
+	integrationTestImplementation 'org.testcontainers:postgresql:1.20.3'
+	integrationTestRuntimeOnly 'org.postgresql:postgresql'
 }
 
 test {
 	useJUnitPlatform()
 	finalizedBy jacocoTestReport
 }
+
+tasks.register('integrationTest', Test) {
+	description = 'Runs integration tests.'
+	group = 'verification'
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	useJUnitPlatform()
+
+	testLogging {
+		events "failed", "skipped"
+		exceptionFormat "full"
+		showStandardStreams true
+	}
+}
+
+check.dependsOn tasks.integrationTest
 
 jacoco {
 	toolVersion = "0.8.13"
