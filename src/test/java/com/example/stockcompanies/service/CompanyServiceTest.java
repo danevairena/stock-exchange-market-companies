@@ -99,6 +99,7 @@ class CompanyServiceTest {
         verify(companyRepository).existsBySymbol("AAPL");
         verify(companyRepository).save(company);
     }
+
     // if website is null service should not call updateWebsite(), but still should save the company
     @Test
     void createCompany_whenWebsiteIsNull_shouldSaveWithoutUpdatingWebsite() {
@@ -224,5 +225,76 @@ class CompanyServiceTest {
         verify(existing).updateWebsite("https://tesla.com");
 
         verify(companyRepository).save(existing);
+    }
+
+    // when company exists service should return it
+    @Test
+    void getCompanyById_whenExists_shouldReturnCompany() {
+
+        Company company = mock(Company.class);
+
+        when(companyRepository.findById(1L))
+                .thenReturn(Optional.of(company));
+
+        Company result =
+                companyService.getCompanyById(1L);
+
+        assertSame(company, result);
+
+        verify(companyRepository).findById(1L);
+    }
+
+    // when company does not exist service should throw exception
+    @Test
+    void getCompanyById_whenMissing_shouldThrow() {
+
+        when(companyRepository.findById(1L))
+                .thenReturn(Optional.empty());
+
+        IllegalStateException ex =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> companyService.getCompanyById(1L)
+                );
+
+        assertEquals(
+                "Company with id 1 not found",
+                ex.getMessage()
+        );
+
+        verify(companyRepository).findById(1L);
+    }
+
+    // when name is null validation should fail
+    @Test
+    void createCompany_whenNameIsNull_shouldThrow() {
+
+        Company company = mock(Company.class);
+        when(company.getName()).thenReturn(null);
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> companyService.createCompany(company)
+        );
+
+        assertEquals("Name is required", ex.getMessage());
+        verifyNoInteractions(companyRepository);
+    }
+
+
+    // when name is blank validation should fail
+    @Test
+    void createCompany_whenNameIsBlank_shouldThrow() {
+
+        Company company = mock(Company.class);
+        when(company.getName()).thenReturn("   ");
+
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> companyService.createCompany(company)
+        );
+
+        assertEquals("Name is required", ex.getMessage());
+        verifyNoInteractions(companyRepository);
     }
 }
