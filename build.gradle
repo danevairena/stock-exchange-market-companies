@@ -46,6 +46,10 @@ configurations {
 
 	integrationTestImplementation.extendsFrom testImplementation
 	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+
+	// Lombok
+	integrationTestCompileOnly.extendsFrom testCompileOnly
+	integrationTestAnnotationProcessor.extendsFrom testAnnotationProcessor
 }
 /* --------------------------------------------------------------------------- */
 
@@ -75,6 +79,21 @@ dependencies {
 	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+	// Lombok (main + test + integrationTest)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	integrationTestCompileOnly 'org.projectlombok:lombok'
+	integrationTestAnnotationProcessor 'org.projectlombok:lombok'
+
+	//MapStruct binding (so MapStruct can use Lombok @Builder)
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	testAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	integrationTestAnnotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
 	// Integration tests (Testcontainers + Postgres driver)
 	integrationTestImplementation 'org.springframework.boot:spring-boot-starter-test'

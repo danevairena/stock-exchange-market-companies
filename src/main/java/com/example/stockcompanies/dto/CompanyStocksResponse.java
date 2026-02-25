@@ -1,11 +1,20 @@
 package com.example.stockcompanies.dto;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
+
 import java.time.Instant;
 
 // CompanyStocksResponse is the DTO class that the endpoint returns to the client
 // it combines data from database (Company) and Finnhub or cache (CompanyStock)
+// Lombok annotations
+@Getter
+@Builder
+@Jacksonized
 public class CompanyStocksResponse {
 
+    // setters because service fills in the response
     // Company entity fields
     private Long id;
     private String name;
@@ -19,31 +28,4 @@ public class CompanyStocksResponse {
     private Double marketCapitalization;
     private Double shareOutstanding;
 
-    // setters because service fills in the response
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-
-    public String getCountry() { return country; }
-    public void setCountry(String country) { this.country = country; }
-
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
-
-    public String getWebsite() { return website; }
-    public void setWebsite(String website) { this.website = website; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-
-    public Double getMarketCapitalization() { return marketCapitalization; }
-    public void setMarketCapitalization(Double marketCapitalization) { this.marketCapitalization = marketCapitalization; }
-
-    public Double getShareOutstanding() { return shareOutstanding; }
-    public void setShareOutstanding(Double shareOutstanding) { this.shareOutstanding = shareOutstanding; }
 }

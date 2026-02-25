@@ -63,8 +63,7 @@ class CompanyStocksServiceTest {
         when(companyStockRepository.findByCompanyIdAndFetchDate(eq(companyId), any(LocalDate.class)))
                 .thenReturn(Optional.of(cached));
 
-        CompanyStocksResponse mapped = new CompanyStocksResponse();
-        mapped.setId(companyId);
+        CompanyStocksResponse mapped = CompanyStocksResponse.builder().id(companyId).build();
 
         // only stub what is actually used: the mapper call that produces the response
         when(mapper.toResponse(company, cached)).thenReturn(mapped);
@@ -113,10 +112,11 @@ class CompanyStocksServiceTest {
         when(companyStockRepository.save(any(CompanyStock.class)))
                 .thenAnswer(inv -> inv.getArgument(0));
 
-        CompanyStocksResponse mapped = new CompanyStocksResponse();
-        mapped.setId(companyId);
-        mapped.setMarketCapitalization(555.0);
-        mapped.setShareOutstanding(111.0);
+        CompanyStocksResponse mapped = CompanyStocksResponse.builder()
+                .id(companyId)
+                .marketCapitalization(555.0)
+                .shareOutstanding(111.0)
+                .build();
 
         // the mapper is called with the company and the saved CompanyStock
         when(mapper.toResponse(eq(company), any(CompanyStock.class))).thenReturn(mapped);

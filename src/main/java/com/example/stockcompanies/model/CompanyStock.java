@@ -11,11 +11,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
+// Lombok annotations
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 //create entity for database table with name company_stocks
 @Entity
 @Table(name = "company_stocks", uniqueConstraints = @UniqueConstraint(name = "uk_company_stock_company_date", columnNames = {"company_id", "fetch_date"}))
@@ -44,8 +50,6 @@ public class CompanyStock {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
-    protected CompanyStock() {}
-
     public CompanyStock(Company company, LocalDate fetchDate, Double marketCapitalization, Double shareOutstanding) {
         // snapshot validation - if any field is null throw NullPointerException immediately and don’t allow invalid records to reach the database
         this.company = Objects.requireNonNull(company);
@@ -58,13 +62,4 @@ public class CompanyStock {
     protected void onCreate() {
         this.createdAt = Instant.now();
     }
-
-    // entity is immutable after recording in db - only getters
-
-    public Long getId() { return id; }
-    public Company getCompany() { return company; }
-    public LocalDate getFetchDate() { return fetchDate; }
-    public Double getMarketCapitalization() { return marketCapitalization; }
-    public Double getShareOutstanding() { return shareOutstanding; }
-    public Instant getCreatedAt() { return createdAt; }
 }

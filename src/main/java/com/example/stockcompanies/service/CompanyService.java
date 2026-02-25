@@ -2,17 +2,16 @@ package com.example.stockcompanies.service;
 
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.repository.CompanyRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CompanyService {
     // Constructor injection ensures that the dependency will always be available, allowing the field to be immutable
     private final CompanyRepository companyRepository;
-    public CompanyService(CompanyRepository companyRepository) {
-        this.companyRepository = companyRepository;
-    }
 
     public Company createCompany(Company company) {
         if (company == null) {

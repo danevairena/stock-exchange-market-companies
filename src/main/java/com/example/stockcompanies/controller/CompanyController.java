@@ -2,6 +2,7 @@ package com.example.stockcompanies.controller;
 
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.service.CompanyService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,14 +20,11 @@ import java.util.List;
 @RestController
 // all endpoints in this controller start with /companies
 @RequestMapping("/companies")
+@RequiredArgsConstructor
 public class CompanyController {
 
     // Constructor injection ensures that the dependency will always be available, allowing the field to be immutable
     private final CompanyService companyService;
-
-    public CompanyController(CompanyService companyService) {
-        this.companyService = companyService;
-    }
 
     // POST /companies
     // when method completes successfully returns HTTP status 201 Created

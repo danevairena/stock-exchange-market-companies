@@ -9,10 +9,17 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
+
 import java.time.Instant;
 import java.util.Objects;
 
 
+// Lombok annotations
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 //create entity for the database
 @Entity
 // set table name
@@ -45,11 +52,10 @@ public class Company {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = Instant.now();
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
     }
-
-    // protected constructor without arguments
-    protected Company() {}
 
     // constructor for new company
     public Company(String name, String symbol, String country, String website, String email, Instant createdAt) {
@@ -58,16 +64,9 @@ public class Company {
         this.country = country;
         this.website = website;
         this.email = email;
+
         this.createdAt = createdAt;
     }
-
-    public Long getId() { return id; }
-    public String getName() { return name; }
-    public String getCountry() { return country; }
-    public String getSymbol() { return symbol; }
-    public String getWebsite() { return website; }
-    public String getEmail() { return email; }
-    public Instant getCreatedAt() { return createdAt; }
 
     // controlled setters
     public void updateName(String name) { this.name = name; }
@@ -82,9 +81,7 @@ public class Company {
         // check if the two variables reference to the same object in the memory
         if (this == o) return true;
         // check if object o is of type Company
-        if (!(o instanceof Company)) return false;
-        // cast object o as company object
-        Company company = (Company) o;
+        if (!(o instanceof Company company)) return false;
         // if id is null - object is not persistent in the db
         // check if id is equal to object in the db
         return id != null && id.equals(company.id);

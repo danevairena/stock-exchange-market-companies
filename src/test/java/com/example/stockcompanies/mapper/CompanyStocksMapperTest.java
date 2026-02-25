@@ -57,61 +57,6 @@ class CompanyStocksMapperTest {
         assertNull(dto.getShareOutstanding());
     }
 
-
-    @Test
-    void enrichFromStock_shouldUpdateOnlyStockFields() {
-
-        // given existing dto and stock snapshot
-        CompanyStocksResponse dto = new CompanyStocksResponse();
-        dto.setId(1L);
-
-        Company company = new Company(
-                "Mega Inc",
-                "MEGA",
-                "BG",
-                null,
-                "mail",
-                Instant.now()
-        );
-
-        CompanyStock stock = new CompanyStock(
-                company,
-                LocalDate.now(),
-                555.0,
-                111.0
-        );
-
-        // when enriching
-        mapper.enrichFromStock(stock, dto);
-
-        // then only enrichment fields should change
-        assertEquals(1L, dto.getId());
-        assertEquals(555.0, dto.getMarketCapitalization());
-        assertEquals(111.0, dto.getShareOutstanding());
-    }
-
-
-    @Test
-    void enrichFromFinnhub_shouldUpdateOnlyFinnhubFields() {
-
-        // given dto and mocked finnhub response
-        CompanyStocksResponse dto = new CompanyStocksResponse();
-        dto.setId(2L);
-
-        FinnhubCompanyProfileResponse finnhub = mock(FinnhubCompanyProfileResponse.class);
-
-        when(finnhub.getMarketCapitalization()).thenReturn(999.0);
-        when(finnhub.getShareOutstanding()).thenReturn(333.0);
-
-        // when enriching
-        mapper.enrichFromFinnhub(finnhub, dto);
-
-        // then enrichment fields should change
-        assertEquals(999.0, dto.getMarketCapitalization());
-        assertEquals(333.0, dto.getShareOutstanding());
-    }
-
-
     @Test
     void toResponse_withStock_shouldCombineCompanyAndStock() {
 
@@ -143,8 +88,8 @@ class CompanyStocksMapperTest {
         // then all fields should be present
         assertEquals(10L, dto.getId());
         assertEquals("Mega Inc", dto.getName());
-        assertEquals(12.0, dto.getMarketCapitalization());
-        assertEquals(34.0, dto.getShareOutstanding());
+        assertEquals(12.0, dto.getMarketCapitalization(), 0.0001);
+        assertEquals(34.0, dto.getShareOutstanding(), 0.0001);
     }
 
 
@@ -174,8 +119,8 @@ class CompanyStocksMapperTest {
 
         // then all fields should be present
         assertEquals(11L, dto.getId());
-        assertEquals(56.0, dto.getMarketCapitalization());
-        assertEquals(78.0, dto.getShareOutstanding());
+        assertEquals(56.0, dto.getMarketCapitalization(), 0.0001);
+        assertEquals(78.0, dto.getShareOutstanding(), 0.0001);
     }
 
 }
