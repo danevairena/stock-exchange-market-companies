@@ -189,6 +189,40 @@ Sensitive data is stored in `.env` and excluded from version control.
 
 ---
 
+# 🐳 Docker Deployment Architecture
+
+The application runs using Docker Compose with two containers:
+
+* stock_api – Spring Boot application
+* stock_db – PostgreSQL database
+
+```mermaid
+flowchart LR
+  subgraph User["Local Machine / Developer"]
+    Browser["Browser / Swagger UI"]
+    CLI["Terminal (Docker Compose)"]
+  end
+
+  subgraph Docker["Docker Network (docker-compose)"]
+    subgraph API["Container: stock_api"]
+      App["Spring Boot App :8080"]
+    end
+
+    subgraph DBc["Container: stock_db"]
+      DB[("PostgreSQL :5432")]
+      Volume[("Named Volume: stock_db_data")]
+    end
+  end
+
+  Browser -->|"HTTP :8080"| App
+  CLI -->|"docker compose up"| Docker
+
+  App -->|"JDBC"| DB
+  DB -->|"persists to"| Volume
+```
+
+---
+
 # 🧪 Example Endpoints
 
 ## Create Company
