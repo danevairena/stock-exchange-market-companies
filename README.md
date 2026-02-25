@@ -1,31 +1,97 @@
 # 📈 Stock Exchange Market Companies API
 
-Spring Boot REST API for managing companies and retrieving stock market data using the Finnhub API.
+Production-ready Spring Boot REST API for managing companies and retrieving real-time stock market data via external financial API integration.
 
-This project demonstrates backend development skills including REST APIs, database integration, external API integration, and secure configuration management.
+This project demonstrates real-world backend engineering practices including clean architecture, external service integration, database persistence, automated testing, and maintainable code design.
+
+---
+
+# ⭐ Key Highlights
+
+* Built production-style REST API using Spring Boot
+* Integrated external financial API (Finnhub) using OpenFeign
+* Designed layered architecture following clean code principles
+* Implemented PostgreSQL persistence using Spring Data JPA
+* Created unit and integration tests using Mockito, WireMock, and Testcontainers
+* Used DTO pattern and MapStruct for clean data transfer
+* Secured sensitive configuration using environment variables
+* Documented and tested endpoints using Swagger
 
 ---
 
 # 🚀 Features
 
 * Create and manage companies
-* Retrieve stock price data from Finnhub API
+* Retrieve real-time stock prices
 * Store daily stock snapshots
 * RESTful API design
 * PostgreSQL database integration
-* Secure secret management using `.env`
+* Integrate external market data providers
+* Persist and serve financial data
+
+---
+
+# 🏗 Architecture Overview
+
+The application follows a layered architecture:
+*Controller Layer - Handles HTTP requests and responses
+*Service Layer - Contains business logic
+*Repository Layer - Handles database communication
+*External Client Layer - Handles communication with Finnhub API
+*Mapper Layer - Maps between Entity and DTO
+
+flowchart TB
+  Client[API Client / Swagger UI] --> C[Controller Layer]
+  C --> S[Service Layer]
+  S --> R[Repository Layer]
+  R --> DB[(PostgreSQL)]
+
+  S --> M[Mapper Layer (MapStruct)]
+  M --> S
+
+  S --> F[External Client Layer (OpenFeign)]
+  F --> Finnhub[(Finnhub API)]
+  
+This structure ensures scalability, testability, and maintainability.
 
 ---
 
 # 🛠 Tech Stack
 
-* Java 17
-* Spring Boot 3
-* Spring Data JPA
-* PostgreSQL
-* Finnhub API
-* Gradle
-* dotenv-java
+Backend
+*Java 25
+*Spring Boot 4
+*Spring Web
+*Spring Data JPA
+Database
+*PostgreSQL
+External Integration
+*Finnhub API
+*OpenFeign
+Testing
+*JUnit 5
+*Mockito
+*WireMock
+*Testcontainers
+Tools
+*Gradle
+*Lombok
+*MapStruct
+*Swagger / OpenAPI
+*dotenv-java
+
+---
+
+# 🧪 Testing Strategy
+
+This project includes production-style testing:
+Unit Testing
+*Service layer isolation using Mockito
+Integration Testing
+*External API mocking using WireMock
+*Real database testing using Testcontainers
+
+This ensures reliability and correctness of business logic and integrations.
 
 ---
 
@@ -112,12 +178,27 @@ GET `/api/stocks/{symbol}`
 
 ---
 
+# 💼 Engineering Practices Demonstrated
+
+This project demonstrates practical experience with:
+*REST API design
+*Spring Boot backend development
+*External API integration
+*Database persistence with JPA
+*DTO and mapping patterns
+*Integration testing
+*Clean architecture
+*Production-style project structure
+
+---
+
 # 👩‍💻 Author
 
 Irena Daneva
+GitHub: https://github.com/danevairena
 
 ---
 
 # 📌 Project Purpose
 
-This project was built for learning and portfolio purposes to demonstrate backend development skills with Spring Boot.
+This project is part of my backend developer portfolio and demonstrates hands-on experience with Java and Spring Boot backend development.
