@@ -46,7 +46,7 @@ flowchart LR
     Client["Client / Swagger UI"]
   end
 
-  subgraph App["Stock Exchange Market Companies API (Spring Boot)"]
+  subgraph App["Stock Exchange API"]
     Controller["Controllers"]
     Service["Services"]
     Mapper["Mappers - MapStruct"]
