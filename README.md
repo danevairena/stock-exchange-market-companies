@@ -41,18 +41,41 @@ The application follows a layered architecture:
 * Mapper Layer - Maps between Entity and DTO
 
 ```mermaid
-flowchart TB
-  Client["API Client / Swagger UI"] --> C["Controller Layer"]
-  C --> S["Service Layer"]
-  S --> R["Repository Layer"]
-  R --> DB[("PostgreSQL")]
+flowchart LR
+  subgraph ClientSide["Client Side"]
+    Client["Client / Swagger UI"]
+  end
 
-  S --> M["Mapper Layer - MapStruct"]
-  M --> S
+  subgraph App["Stock Exchange Market Companies API (Spring Boot)"]
+    Controller["Controllers"]
+    Service["Services"]
+    Mapper["Mappers - MapStruct"]
+    Repo["Repositories - JPA"]
+    Scheduler["Daily Snapshot Job"]
+  end
 
-  S --> F["External Client Layer - OpenFeign"]
-  F --> Finnhub[("Finnhub API")]
+  subgraph Data["Data Layer"]
+    DB[("PostgreSQL")]
+  end
+
+  subgraph External["External Providers"]
+    Finnhub[("Finnhub API")]
+  end
+
+  Client --> Controller
+  Controller --> Service
+
+  Service --> Mapper
+  Mapper --> Service
+
+  Service --> Repo
+  Repo --> DB
+
+  Scheduler --> Service
+
+  Service --> Finnhub
 ```
+
 This structure ensures scalability, testability, and maintainability.
 
 ---
