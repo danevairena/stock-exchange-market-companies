@@ -34,12 +34,13 @@ This project demonstrates real-world backend engineering practices including cle
 # 🏗 Architecture Overview
 
 The application follows a layered architecture:
-*Controller Layer - Handles HTTP requests and responses
-*Service Layer - Contains business logic
-*Repository Layer - Handles database communication
-*External Client Layer - Handles communication with Finnhub API
-*Mapper Layer - Maps between Entity and DTO
+* Controller Layer - Handles HTTP requests and responses
+* Service Layer - Contains business logic
+* Repository Layer - Handles database communication
+* External Client Layer - Handles communication with Finnhub API
+* Mapper Layer - Maps between Entity and DTO
 
+```mermaid
 flowchart TB
   Client[API Client / Swagger UI] --> C[Controller Layer]
   C --> S[Service Layer]
@@ -53,32 +54,33 @@ flowchart TB
   F --> Finnhub[(Finnhub API)]
   
 This structure ensures scalability, testability, and maintainability.
+```
 
 ---
 
 # 🛠 Tech Stack
 
 Backend
-*Java 25
-*Spring Boot 4
-*Spring Web
-*Spring Data JPA
+* Java 25
+* Spring Boot 4
+* Spring Web
+* Spring Data JPA
 Database
-*PostgreSQL
+* PostgreSQL
 External Integration
-*Finnhub API
-*OpenFeign
+* Finnhub API
+* OpenFeign
 Testing
-*JUnit 5
-*Mockito
-*WireMock
-*Testcontainers
+* JUnit 5
+* Mockito
+* WireMock
+* Testcontainers
 Tools
-*Gradle
-*Lombok
-*MapStruct
-*Swagger / OpenAPI
-*dotenv-java
+* Gradle
+* Lombok
+* MapStruct
+* Swagger / OpenAPI
+* dotenv-java
 
 ---
 
@@ -86,10 +88,10 @@ Tools
 
 This project includes production-style testing:
 Unit Testing
-*Service layer isolation using Mockito
+* Service layer isolation using Mockito
 Integration Testing
-*External API mocking using WireMock
-*Real database testing using Testcontainers
+* External API mocking using WireMock
+* Real database testing using Testcontainers
 
 This ensures reliability and correctness of business logic and integrations.
 
@@ -181,14 +183,14 @@ GET `/api/stocks/{symbol}`
 # 💼 Engineering Practices Demonstrated
 
 This project demonstrates practical experience with:
-*REST API design
-*Spring Boot backend development
-*External API integration
-*Database persistence with JPA
-*DTO and mapping patterns
-*Integration testing
-*Clean architecture
-*Production-style project structure
+* REST API design
+* Spring Boot backend development
+* External API integration
+* Database persistence with JPA
+* DTO and mapping patterns
+* Integration testing
+* Clean architecture
+* Production-style project structure
 
 ---
 
