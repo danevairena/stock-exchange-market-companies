@@ -52,9 +52,8 @@ flowchart TB
 
   S --> F[External Client Layer (OpenFeign)]
   F --> Finnhub[(Finnhub API)]
-  
-This structure ensures scalability, testability, and maintainability.
 ```
+This structure ensures scalability, testability, and maintainability.
 
 ---
 
