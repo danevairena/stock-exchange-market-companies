@@ -66,7 +66,6 @@ flowchart LR
   Controller --> Service
 
   Service --> Mapper
-  Mapper --> Service
 
   Service --> Repo
   Repo --> DB
