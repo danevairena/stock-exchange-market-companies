@@ -42,16 +42,16 @@ The application follows a layered architecture:
 
 ```mermaid
 flowchart TB
-  Client[API Client / Swagger UI] --> C[Controller Layer]
-  C --> S[Service Layer]
-  S --> R[Repository Layer]
-  R --> DB[(PostgreSQL)]
+  Client["API Client / Swagger UI"] --> C["Controller Layer"]
+  C --> S["Service Layer"]
+  S --> R["Repository Layer"]
+  R --> DB[("PostgreSQL")]
 
-  S --> M[Mapper Layer (MapStruct)]
+  S --> M["Mapper Layer - MapStruct"]
   M --> S
 
-  S --> F[External Client Layer (OpenFeign)]
-  F --> Finnhub[(Finnhub API)]
+  S --> F["External Client Layer - OpenFeign"]
+  F --> Finnhub[("Finnhub API")]
 ```
 This structure ensures scalability, testability, and maintainability.
 
@@ -64,16 +64,20 @@ Backend
 * Spring Boot 4
 * Spring Web
 * Spring Data JPA
+  
 Database
 * PostgreSQL
+  
 External Integration
 * Finnhub API
 * OpenFeign
+  
 Testing
 * JUnit 5
 * Mockito
 * WireMock
 * Testcontainers
+  
 Tools
 * Gradle
 * Lombok
