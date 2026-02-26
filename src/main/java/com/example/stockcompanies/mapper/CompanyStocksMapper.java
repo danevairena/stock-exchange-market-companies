@@ -4,10 +4,8 @@ import com.example.stockcompanies.dto.CompanyStocksResponse;
 import com.example.stockcompanies.dto.FinnhubCompanyProfileResponse;
 import com.example.stockcompanies.model.Company;
 import com.example.stockcompanies.model.CompanyStock;
-import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 @Mapper(config = MapStructConfig.class)
 public interface CompanyStocksMapper {
